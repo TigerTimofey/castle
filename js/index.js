@@ -18,6 +18,32 @@ const player = new Player({
   collisionBlocks,
   imageSrc: "./img/king/idle.png",
   frameRate: 11,
+  animation: {
+    idleRight: {
+      frameRate: 11,
+      // frameBuffer: 2
+      frameBuffer: 24 / frameRate,
+      loop: true,
+    },
+    idleLeft: {
+      frameRate: 11,
+      // frameBuffer: 2
+      frameBuffer: 24 / frameRate,
+      loop: true,
+    },
+    runRight: {
+      frameRate: 8,
+      // frameBuffer: 2
+      frameBuffer: 24 / frameRate,
+      loop: true,
+    },
+    runLeft: {
+      frameRate: 8,
+      // frameBuffer: 2
+      frameBuffer: 24 / frameRate,
+      loop: true,
+    },
+  },
 });
 const keys = {
   w: {
