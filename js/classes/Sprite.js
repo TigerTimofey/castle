@@ -18,6 +18,9 @@ class Sprite {
 
     if (this.animations) {
       for (let key in animations) {
+        const image = new Image();
+        image.src = this.animations[key].imageSrc;
+        this.animations[key].image = image;
       }
     }
   }

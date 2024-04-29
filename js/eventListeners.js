@@ -2,7 +2,7 @@ window.addEventListener("keydown", function (e) {
   switch (e.key) {
     case "w":
       if (player.velocity.y === 0) {
-        player.velocity.y = -25;
+        player.velocity.y = -20;
       }
       break;
     case "a":
