@@ -4,51 +4,174 @@ const c = canvas.getContext("2d");
 canvas.width = 64 * 18;
 canvas.height = 64 * 9;
 
-const parsedCollisions = collisionsLevel1.parse2D();
-const collisionBlocks = parsedCollisions.createOjectFrom2D();
-
-const backgroundLevel1 = new Sprite({
-  position: {
-    x: 0,
-    y: 0,
-  },
-  imageSrc: "./img/backgroundLevel1.png",
-});
+let parsedCollisions;
+let collisionBlocks;
+let background;
+let doors;
 const player = new Player({
-  collisionBlocks,
   imageSrc: "./img/king/idle.png",
   frameRate: 11,
   animations: {
+    wtf: {
+      frameRate: 3,
+      frameBuffer: 2,
+      loop: true,
+      imageSrc: "./img/wtf.png",
+    },
     idleRight: {
       frameRate: 11,
       frameBuffer: 2,
-      // frameBuffer: 24 / frameRate,
       loop: true,
       imageSrc: "./img/king/idle.png",
     },
     idleLeft: {
       frameRate: 11,
       frameBuffer: 2,
-      // frameBuffer: 24 / frameRate,
       loop: true,
       imageSrc: "./img/king/idleLeft.png",
     },
     runRight: {
       frameRate: 8,
       frameBuffer: 4,
-      // frameBuffer: 24 / frameRate,
       loop: true,
       imageSrc: "./img/king/runRight.png",
     },
     runLeft: {
       frameRate: 8,
       frameBuffer: 4,
-      // frameBuffer: 24 / frameRate,
       loop: true,
       imageSrc: "./img/king/runLeft.png",
     },
+    enterDoor: {
+      frameRate: 8,
+      frameBuffer: 4,
+      loop: false,
+      imageSrc: "./img/king/enterDoor.png",
+      onComplete: () => {
+        gsap.to(overlay, {
+          opacity: 1,
+          onComplete: () => {
+            level++;
+            levels[level].init();
+            gsap.to(overlay, {
+              opacity: 0,
+            });
+          },
+        });
+      },
+    },
   },
 });
+
+let level = 3;
+let levels = {
+  1: {
+    init: () => {
+      parsedCollisions = collisionsLevel1.parse2D();
+      collisionBlocks = parsedCollisions.createOjectFrom2D();
+      player.collisionBlocks = collisionBlocks;
+      background = new Sprite({
+        position: {
+          x: 0,
+          y: 0,
+        },
+        imageSrc: "./img/backgroundLevel1.png",
+      });
+      doors = [
+        new Sprite({
+          position: {
+            x: 767,
+            y: 270,
+          },
+          imageSrc: "./img/doorOpen.png",
+          frameRate: 5,
+          frameBuffer: 5,
+          loop: false,
+          autoplay: false,
+        }),
+      ];
+    },
+  },
+  2: {
+    init: () => {
+      parsedCollisions = collisionsLevel2.parse2D();
+      collisionBlocks = parsedCollisions.createOjectFrom2D();
+      player.collisionBlocks = collisionBlocks;
+      player.position.x = 96;
+      player.position.y = 140;
+
+      background = new Sprite({
+        position: {
+          x: 0,
+          y: 0,
+        },
+        imageSrc: "./img/backgroundLevel2.png",
+      });
+      doors = [
+        new Sprite({
+          position: {
+            x: 772,
+            y: 336,
+          },
+          imageSrc: "./img/doorOpen.png",
+          frameRate: 5,
+          frameBuffer: 5,
+          loop: false,
+          autoplay: false,
+        }),
+      ];
+    },
+  },
+  3: {
+    init: () => {
+      parsedCollisions = collisionsLevel3.parse2D();
+      collisionBlocks = parsedCollisions.createOjectFrom2D();
+      player.collisionBlocks = collisionBlocks;
+      player.position.x = 750;
+      player.position.y = 100;
+
+      background = new Sprite({
+        position: {
+          x: 0,
+          y: 0,
+        },
+        imageSrc: "./img/backgroundLevel3.png",
+      });
+      doors = [
+        new Sprite({
+          position: {
+            x: 175,
+            y: 336,
+          },
+          imageSrc: "./img/doorOpen.png",
+          frameRate: 5,
+          frameBuffer: 5,
+          loop: false,
+          autoplay: false,
+        }),
+      ];
+    },
+  },
+};
+
+const wtf = new Player({
+  collisionBlocks,
+  imageSrc: "./img/wtf.png",
+  frameRate: 3,
+});
+
+const wtfText = [
+  new Sprite({
+    position: {
+      x: 100,
+      y: 100,
+    },
+    imageSrc: "./img/wtf.png",
+    frameRate: 3,
+    frameBuffer: 5,
+  }),
+];
+
 const keys = {
   w: {
     pressed: false,
@@ -61,29 +184,34 @@ const keys = {
   },
 };
 
+const overlay = {
+  opacity: 0,
+};
+
 function animate() {
   window.requestAnimationFrame(animate);
 
-  backgroundLevel1.draw();
+  background.draw();
   collisionBlocks.forEach((collisionBlock) => {
     collisionBlock.draw();
   });
+  doors.forEach((door) => {
+    door.draw();
+  });
+  wtfText.forEach((wtf) => {
+    wtf.draw();
+  });
 
-  player.velocity.x = 0;
-  if (keys.d.pressed) {
-    player.switchSprite("runRight");
-    player.velocity.x = 5;
-    player.lastDirection = "right";
-  } else if (keys.a.pressed) {
-    player.switchSprite("runLeft");
-    player.velocity.x = -5;
-    player.lastDirection = "left";
-  } else {
-    if (player.lastDirection === "left") player.switchSprite("idleLeft");
-    else player.switchSprite("idleRight");
-  }
+  player.handleInput(keys);
   player.draw();
   player.update();
+
+  c.save();
+  c.globalAlpha = overlay.opacity;
+  c.fillStyle = "black";
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  c.restore();
 }
 
+levels[level].init();
 animate();
