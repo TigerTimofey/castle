@@ -1,8 +1,8 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
-canvas.width = 64 * 18;
-canvas.height = 64 * 9;
+canvas.width = 64 * 16; // 1024
+canvas.height = 64 * 9; // 576
 
 let parsedCollisions;
 let collisionBlocks;
@@ -12,12 +12,6 @@ const player = new Player({
   imageSrc: "./img/king/idle.png",
   frameRate: 11,
   animations: {
-    wtf: {
-      frameRate: 3,
-      frameBuffer: 2,
-      loop: true,
-      imageSrc: "./img/wtf.png",
-    },
     idleRight: {
       frameRate: 11,
       frameBuffer: 2,
@@ -48,11 +42,16 @@ const player = new Player({
       loop: false,
       imageSrc: "./img/king/enterDoor.png",
       onComplete: () => {
+        console.log("completed animation");
         gsap.to(overlay, {
           opacity: 1,
           onComplete: () => {
             level++;
+
+            if (level === 4) level = 1;
             levels[level].init();
+            player.switchSprite("idleRight");
+            player.preventInput = false;
             gsap.to(overlay, {
               opacity: 0,
             });
@@ -63,13 +62,15 @@ const player = new Player({
   },
 });
 
-let level = 3;
+let level = 1;
 let levels = {
   1: {
     init: () => {
       parsedCollisions = collisionsLevel1.parse2D();
-      collisionBlocks = parsedCollisions.createOjectFrom2D();
+      collisionBlocks = parsedCollisions.createObjectsFrom2D();
       player.collisionBlocks = collisionBlocks;
+      if (player.currentAnimation) player.currentAnimation.isActive = false;
+
       background = new Sprite({
         position: {
           x: 0,
@@ -77,6 +78,7 @@ let levels = {
         },
         imageSrc: "./img/backgroundLevel1.png",
       });
+
       doors = [
         new Sprite({
           position: {
@@ -95,10 +97,12 @@ let levels = {
   2: {
     init: () => {
       parsedCollisions = collisionsLevel2.parse2D();
-      collisionBlocks = parsedCollisions.createOjectFrom2D();
+      collisionBlocks = parsedCollisions.createObjectsFrom2D();
       player.collisionBlocks = collisionBlocks;
       player.position.x = 96;
       player.position.y = 140;
+
+      if (player.currentAnimation) player.currentAnimation.isActive = false;
 
       background = new Sprite({
         position: {
@@ -107,10 +111,11 @@ let levels = {
         },
         imageSrc: "./img/backgroundLevel2.png",
       });
+
       doors = [
         new Sprite({
           position: {
-            x: 772,
+            x: 772.0,
             y: 336,
           },
           imageSrc: "./img/doorOpen.png",
@@ -125,10 +130,11 @@ let levels = {
   3: {
     init: () => {
       parsedCollisions = collisionsLevel3.parse2D();
-      collisionBlocks = parsedCollisions.createOjectFrom2D();
+      collisionBlocks = parsedCollisions.createObjectsFrom2D();
       player.collisionBlocks = collisionBlocks;
       player.position.x = 750;
-      player.position.y = 100;
+      player.position.y = 230;
+      if (player.currentAnimation) player.currentAnimation.isActive = false;
 
       background = new Sprite({
         position: {
@@ -137,11 +143,12 @@ let levels = {
         },
         imageSrc: "./img/backgroundLevel3.png",
       });
+
       doors = [
         new Sprite({
           position: {
-            x: 175,
-            y: 336,
+            x: 176.0,
+            y: 335,
           },
           imageSrc: "./img/doorOpen.png",
           frameRate: 5,
@@ -153,24 +160,6 @@ let levels = {
     },
   },
 };
-
-const wtf = new Player({
-  collisionBlocks,
-  imageSrc: "./img/wtf.png",
-  frameRate: 3,
-});
-
-const wtfText = [
-  new Sprite({
-    position: {
-      x: 100,
-      y: 100,
-    },
-    imageSrc: "./img/wtf.png",
-    frameRate: 3,
-    frameBuffer: 5,
-  }),
-];
 
 const keys = {
   w: {
@@ -192,14 +181,15 @@ function animate() {
   window.requestAnimationFrame(animate);
 
   background.draw();
-  collisionBlocks.forEach((collisionBlock) => {
-    collisionBlock.draw();
-  });
+
+  //show collision
+
+  // collisionBlocks.forEach((collisionBlock) => {
+  //   collisionBlock.draw();
+  // });
+
   doors.forEach((door) => {
     door.draw();
-  });
-  wtfText.forEach((wtf) => {
-    wtf.draw();
   });
 
   player.handleInput(keys);

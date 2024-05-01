@@ -1,5 +1,5 @@
 class Player extends Sprite {
-  constructor({ CollisionBlocks = [], imageSrc, frameRate, animations, loop }) {
+  constructor({ collisionBlocks = [], imageSrc, frameRate, animations, loop }) {
     super({ imageSrc, frameRate, animations, loop });
     this.position = {
       x: 200,
@@ -15,44 +15,47 @@ class Player extends Sprite {
       bottom: this.position.y + this.height,
     };
     this.gravity = 1;
+
     this.collisionBlocks = collisionBlocks;
   }
-  // draw() {
-  //   c.fillStyle = "red";
-  //   c.fillRect(this.position.x, this.position.y, this.width, this.height);
-  // }
+
   update() {
-    // c.fillStyle = "rgba(0,0,255,0.5)";
-    // c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    // this is the blue box
+    // c.fillStyle = 'rgba(0, 0, 255, 0.5)'
+    // c.fillRect(this.position.x, this.position.y, this.width, this.height)
+
     this.position.x += this.velocity.x;
+
     this.updateHitbox();
+
     this.checkForHorizontalCollisions();
     this.applyGravity();
 
     this.updateHitbox();
+
     // c.fillRect(
     //   this.hitbox.position.x,
     //   this.hitbox.position.y,
     //   this.hitbox.width,
     //   this.hitbox.height
-    // );
-
+    // )
     this.checkForVerticalCollisions();
   }
+
   handleInput(keys) {
-    if (player.preventInput) return;
-    player.velocity.x = 0;
+    if (this.preventInput) return;
+    this.velocity.x = 0;
     if (keys.d.pressed) {
-      player.switchSprite("runRight");
-      player.velocity.x = 5;
-      player.lastDirection = "right";
+      this.switchSprite("runRight");
+      this.velocity.x = 5;
+      this.lastDirection = "right";
     } else if (keys.a.pressed) {
-      player.switchSprite("runLeft");
-      player.velocity.x = -5;
-      player.lastDirection = "left";
+      this.switchSprite("runLeft");
+      this.velocity.x = -5;
+      this.lastDirection = "left";
     } else {
-      if (player.lastDirection === "left") player.switchSprite("idleLeft");
-      else player.switchSprite("idleRight");
+      if (this.lastDirection === "left") this.switchSprite("idleLeft");
+      else this.switchSprite("idleRight");
     }
   }
 
@@ -60,7 +63,6 @@ class Player extends Sprite {
     if (this.image === this.animations[name].image) return;
     this.currentFrame = 0;
     this.image = this.animations[name].image;
-
     this.frameRate = this.animations[name].frameRate;
     this.frameBuffer = this.animations[name].frameBuffer;
     this.loop = this.animations[name].loop;
@@ -74,14 +76,8 @@ class Player extends Sprite {
         y: this.position.y + 34,
       },
       width: 50,
-      height: 54,
+      height: 53,
     };
-    // c.fillRect(
-    //   this.hitbox.position.x + 50,
-    //   this.hitbox.position.y - 30,
-    //   40,
-    //   10
-    // );
   }
 
   checkForHorizontalCollisions() {
